@@ -1,0 +1,96 @@
+{% extends "base.html" %}
+{% block content%}
+<link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css" rel="stylesheet">
+<script src="https://code.jquery.com/jquery-1.12.4.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+
+<style>
+    .sidebar-timeline {
+        width: 300px;
+        position: fixed;
+        height: 100%;
+        overflow-y: auto;
+        background: #f8f9fa;
+        padding: 20px;
+        border-right: 1px solid #ddd;
+    }
+
+    .sidebar-timeline .timeline-step {
+        margin-bottom: 30px;
+    }
+
+    .sidebar-timeline .timeline-step .icon {
+        font-size: 20px;
+        margin-right: 10px;
+    }
+
+    .sidebar-timeline .timeline-step.done {
+        color: green;
+    }
+
+    .sidebar-timeline .timeline-step.pending {
+        color: gray;
+    }
+
+    .sidebar-timeline .timeline-step .btn {
+        margin-top: 10px;
+    }
+</style>
+
+<div class="sidebar-timeline">
+    <h4>suivi de la commande n° {{ commande.id_commande_client }}</h4>
+
+    <!-- Étape 1 : Création -->
+    <div class="timeline-step {{'pending' if livraison.statut == 79767321 else 'done' if livraison.statut > 79767321 }}">
+        <span class="icon glyphicon glyphicon-pencil"></span>
+        <strong>Commande créée</strong>
+        <div class="text-muted">{{ commande.date}}</div>
+    </div>
+
+    <!-- Étape 2 : Validation -->
+    <div class="timeline-step done">
+        <span class="icon glyphicon glyphicon-check"></span>
+        <strong>Commande validée</strong>
+        <div class="text-muted">20/05/2025 - 15:10</div>
+    </div>
+
+    <!-- Étape 3 : Préparation -->
+    <div class="timeline-step {{'pending' if livraison.statut == 79767323 or livraison.statut == 79767322  else 'done' if livraison.statut > 79767323 }}">
+        <span class="icon glyphicon glyphicon-cog"></span>
+        <strong>En préparation</strong>
+        <div class="text-muted">20/05/2025 - 16:00</div>
+    </div>
+
+    <!-- Étape 4 : Expédition -->
+    <div class="timeline-step {{'done' if livraison.statut == 79767326 else 'pending' if livraison.statut < 79767326 }}" id="step-expedition">
+        <span class="icon glyphicon glyphicon-plane"></span>
+        <strong>En cours d’expédition</strong>
+        <div class="text-muted">En attente</div>
+        <button class="btn btn-sm btn-primary" onclick="validerEtape('expedition')">Marquer comme expédiée</button>
+    </div>
+
+    <!-- Étape 5 : Livraison -->
+    <div class="timeline-step {{'done' if livraison.statut == 79767327 or livraison.statut == 79767328  else 'pending' if livraison.statut < 79767327 }}" id="step-livraison">
+        <span class="icon glyphicon glyphicon-home"></span>
+        <strong>Livrée</strong>
+        <div class="text-muted">En attente</div>
+    </div>
+</div>
+
+<script>
+    function validerEtape(etape) {
+        if (etape === 'expedition') {
+            $('#step-expedition')
+                .removeClass('pending')
+                .addClass('done')
+                .find('.text-muted').text(new Date().toLocaleString());
+            $('#step-expedition .btn').remove();
+
+            // Activer la livraison ensuite
+            $('#step-livraison')
+                .removeClass('pending')
+                .addClass('done')
+                .find('.text-muted').text(new Date().toLocaleString());
+        }
+    }
+</script>

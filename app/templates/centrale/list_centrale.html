@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+{% block content %}
+<div style="margin-left:50px;"> 
+<h2>Liste des Centrales</h2>
+<p>{{ user_type }} - {{ user_id }}</p>
+<table class="table">
+  <thead>
+    <tr>
+      <th scope="col">Id</th>
+      <th scope="col">Name</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for centrale in centrales %}
+    <tr>
+      <td><a href="{{ url_for('centrale.centrale_dashboard') }}">{{ centrale.id_centrale }}</a></td>
+      <td><strong>{{ centrale.nom }}</strong></td>
+      
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+    
+      <li></li>
+    
+    </div>
+{% endblock %}

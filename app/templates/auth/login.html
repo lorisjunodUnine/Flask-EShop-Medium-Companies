@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container">
+        <div class="row flex-lg-row-reverse align-items-center" style="background-color: blue;">
+            <div class="col-lg-6">
+                <div class="lc-block">
+                    <div style="background-color: blue;">
+                        <div class="card" style="width: 18rem;">
+                            <div class="card-title">
+                                <h2>Connexion</h2>
+                            </div>
+                            <div class="card-body">
+                                <form method="post">
+                                    <select name="user_type" class="form-select">
+                                        
+                                        <option value="client">Client</option>
+                                        <option value="centrale">Centrale</option>
+                                        <option value="filiale">Filiale</option>
+                                        <option value="fournisseur">Fournisseur</option>
+                                    </select><br>
+                                    <label>Email (ou nom pour filiale) :</label>
+                                    <input type="text"  class="form-control" name="email"><br>
+                                    <button type="submit" class="btn btn-outline-secondary">Connexion</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="lc-block">
+                    <div editable="rich">
+                        <h1 class="text-white">Application<br>Login Page</h1>
+                        <p class="lead text-white">Login ou inscription</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}

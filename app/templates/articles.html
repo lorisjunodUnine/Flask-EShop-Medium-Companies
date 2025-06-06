@@ -1,0 +1,134 @@
+{% extends "base.html" %}
+{% block content %}
+<div id="carouselExampleIndicators" class="carousel slide">
+  <div class="carousel-indicators">
+    <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
+    <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="1" aria-label="Slide 2"></button>
+    <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="2" aria-label="Slide 3"></button>
+  </div>
+  <div class="carousel-inner rounded-shadow">
+    <div class="carousel-item active">
+      <img src="..." class="d-block w-100" alt="...">
+    </div>
+    <div class="carousel-item">
+      <img src="..." class="d-block w-100" alt="...">
+    </div>
+    <div class="carousel-item">
+      <img src="..." class="d-block w-100" alt="...">
+    </div>
+  </div>
+  <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide="prev">
+    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+    <span class="visually-hidden">Previous</span>
+  </button>
+  <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide="next">
+    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+    <span class="visually-hidden">Next</span>
+  </button>
+</div>
+
+<div class="row">
+  <div class="col-md-3 mb-4">
+    <div class="card shadow-sm">
+      <div class="card-header bg-primary text-white">
+        <h5 class="mb-0">Filtres</h5>
+      </div>
+      <div class="card-body">
+        <form method="get" class="mb-0">
+          <div class="mb-3">
+            <label for="libel_categorie" class="form-label">catégorie:</label>
+            <select name="libel_categorie" id="libel_categorie" class="form-select">
+              <option value="">Toutes les catégories</option>
+              {%for categorie in categories %}
+              <option value="{{ categorie.libel_categorie }}" {% if request.args.get('libel_categorie') == categorie.libel_categorie %}selected{% endif %}>
+                {{ categorie.libel_categorie }}
+              </option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="mb-3">
+            <label for="libel_marque" class="form-label">marque:</label>
+            <select name="libel_marque" id="libel_marque" class="form-select">
+              <option value="">Toutes les marques</option>
+              {% for marque in marques %}
+              <option value="{{marque.libel_marque }}" {% if request.args.get('libel_marque') == marque.libel_marque %}selected{% endif %}>
+                {{ marque.libel_marque }}
+              </option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="mb-3">
+            <label for="min_price" class="form-label">Prix minimum:</label>
+            <input name="min_price" id="min_price" type="number" step="0.01" class="form-control" value="{{ request.args.get('min_price', '') }}">
+          </div>
+          <div class="mb-3">
+            <label for="max_price" class="form-label">Prix maximum:</label>
+            <input name="max_price" id="max_price" type="number" step="0.01" class="form-control" value="{{ request.args.get('max_price', '') }}">
+          </div>
+
+          <button type="submit" class="btn btn-primary w-100">Filtrer</button>
+        </form>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-9">
+    <div class="card-header bg-primary text-white d-flex justify-content-between align-center">
+      <h5 class="mb-0">Nos Articles</h5>
+      <span class="badge bg-light text-dark">{{ articles|length }} articles</span>
+    </div>
+    <div class="card-body">
+      {% if articles %}
+      <div class="row row-cols-1 row-cols-3 g-4">
+        {% for article in articles %}
+        <div class="col">
+          <div class="card h-100 hover-shadow">
+            <div class="position-relative">
+              <img src="{{ url_for('static', filename='media/articles/' ~article.image_url) }}" 
+              class="card-img-top" alt="{{ article.nom_article }}"
+              onerror="this.src=https://via.placeholder.com/300x200?text={{ article.nom_article }}"
+              style="height:200px;object-fit:contain;">
+              {% if article.stock|selectattr('est_en_alerte')|list|length > 0 %}
+              <span class="position-absolute top-0 end-0 badge bg-danger m-2">Stock limité</span>
+              {% endif %}
+            </div>
+            <div class="card-body">
+              <h5 class="card-title">{{ article.nom_article}}</h5>
+              <p class="card-text mb-1">
+                <small class="text-muted">{{article.marque.libel_marque }} - {{article.categorie.libel_categorie }}</small>
+              </p>
+              <p class="card-text mb-0">
+                {% if article.article_description %}
+                {{ article.article_description|truncate(70) }}
+                {% endif %}
+              </p>
+            </div>
+            <div class="card-footer d-flex justify-content-between align-item-center">
+              <h5 class="text-primary mb-0">{{ "%.2f"|format(article.prix_unitaire) }} CHF</h5>
+              <div> 
+                <form action="{{ url_for('client.ajouter_au_panier', id_article=article.id_article) }}" method="post">
+                    Quantity: 
+                    <input type="number" value="1" name="quantite" min="1" max="50" onkeyup="if(this.value > 50) this.value=50;" required>
+                    <br><br>
+                    <input type="submit" class="add-to-cart" value="Add to Cart" name="add">
+                </form>
+              </div>
+              <div>
+                <a href="{{ url_for('home.article_detail', id_article=article.id_article) }}" class="btn btn-sm btn-outline-primary">
+                  Détails
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+      {% else %}
+      <div class="alert-info">
+        Aucun article ne correspond à vos critères de recherche.
+      </div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% endblock %}
+

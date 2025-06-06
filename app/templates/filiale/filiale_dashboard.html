@@ -1,0 +1,142 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container-fluid mt-4">
+    <h1 class="mt-4">Tableaux de bord - Vendeur - Filiale {{ filiale.nom }}</h1>
+<div class="row">
+<div class="col-md-6">
+    <div class="card md-4">
+        <div class="card-header bg-primary text-white">
+            <h4>Commandes à préparer</h4>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-stripped">
+                    <thead>
+                        <tr>
+                            <th>N° Commande</th>
+                            <th>Client</th>
+                            <th>Date</th>
+                            <th>Mode de livraison</th>
+                            <th>Statut du paiement</th>
+                            <th>Statut de la commande</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for commande in commandes_filiales %}
+                        <tr>
+                            <td>{{ commande.id_commande_client }}</td>
+                            <td> {{ commande.client.nom }} {{ commande.client.prenom }}</td>
+                            <td> {{ commande.date.strftime ('%d/%m/%Y') }}</td>
+                            <td> {{ commande.mode_livraison.libel }}</td>
+                            <td> {{ commande.statut_paiement_commande.libel }}</td>
+                            <td> {{ commande.id_statut_commande }}{{ commande.statut_commande.libel }}</td>
+                            <td> 
+                                {% if commande.id_statut_commande == 79767321 or commande.id_statut_commande == 79767322 %}
+                                <a href="{{ url_for('filiale.preparer_commande_detail', commande_id=commande.id_commande_client) }}" class="btn btn-sm btn-primary">Préparer</a>
+                                {% elif commande.id_statut_commande == 79767323 and commande.id_statut_paiement_commande == 3 %}
+                                <a href="{{ url_for('filiale.commande_pret', commande_id=commande.id_commande_client) }}"
+                                class="btn btn-sm btn-warning">Marquer comme prête</a>
+                                {% elif commande.id_statut_commande in [79767324, 79767325] and commande.id_statut_paiement_commande == 3 %}
+                                <a href="{{ url_for('filiale.livrer_ou_retirer_commande', commande_id=commande.id_commande_client) }}"
+                                class="btn btn-sm btn-success">Finaliser (livrée/emportée)</a>
+                                {% else %}
+                                <span class="text-muted">Aucune action</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="col-md-6">
+    <div class="card mb-4">
+        <div class="card-header bg-warning text-white">
+            <h4>Stocks en alerte</h4>
+        </div>
+        <div class="card-body">
+            {% if stocks_alerte %}
+            <div class="table-responsive">
+                <table class="table table-stripped">
+                    <thead>
+                        <tr>
+                            <th>Article</th>
+                            <th>Stock</th>
+                            <th>Seuil</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for stock in stocks_alerte %}
+                        <tr>
+                            <td>{{ stock.article.nom_article }}</td>
+                            <td class="text-danger">{{ stock.quantite_disponible }}</td>
+                            <td>{{ stock.seuil_alerte }}</td>
+                            <td>
+                                <button class="btn btn-sm btn-info"
+                                data-bs-toggle="modal"
+                                data-bs-target="#demandeSTockModal"
+                                data-article="{{ stock.article.id_article }}">
+                            Demander
+                            </button>
+                            </td>
+                            </tr>
+                            {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="alert alert-success">
+                Aucun stock en alerte pour cette filiale
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+</div>
+<div class="modal fade" id="demandeStockModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form method="POST" action="{{ url_for('filiale.demander_stock') }}">
+                <div class="modal-header">
+                    <h5 class="modal-title">Demande de stock</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                    <div class="modal-body">
+                        <input type="hidden" name="article_id" id="modal_article_id">
+                        <div class="mb-3">
+                            <label for="quantite" class="form-label">Quantite demandée</label>
+                            <input type="number" class="form-control" id="quantite" name="quantite" min="1" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="urgence" class="form-label">Niveau d'urgence</label>
+                            <select class="form-select" id="urgence" name="urgence">
+                                <option value="normal">Normal</option>
+                                <option value="urgent">Urgent</option>
+                                <option value="critique">Critique</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                        <button type="submit" class="btn btn-primary">Envoyer la demande</button>
+                    </div>
+            </form>
+        </div>
+    </div>
+</div>
+</div>
+
+{% block script %}
+<script>
+    document.getElementById('demandeStockModal').addEventListener('show.bs.modal', function (event){
+        var button = event.relatedTarget;
+        var articleId=button.getAttribute('data-article');
+        document.getElementById('modal_article_id').value = articleId;
+    });
+</script>
+{% endblock %}
+{% endblock %}

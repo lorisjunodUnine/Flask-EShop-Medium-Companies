@@ -1,0 +1,8 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<h2>Commande Validée</h2>
+<p> Votre commande n° {{ commande.id_commande_client }} a bien été prise en compte.</p>
+<p>Montant total : {{ commande.montant_total }} CHF </p>
+<a href="{{ url_for('client.afficher_panier') }}">Retour au panier</a>
+{% endblock %}

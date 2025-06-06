@@ -1,0 +1,206 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>Détail de l'article</h2>
+    
+    <div class="card mb-4">
+        <div class="card-header">
+            <h3>{{ article.nom }}</h3>
+        </div>
+        <div class="card-body">
+            <p> Stock disponible (le {{ reference_date or 'today'}}): {{ vente_sorties_total }}</p>
+            <p> Vente {{ vente_sorties_total }} </p>
+            <div class="row">
+                <div class="col-md-6">
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item"><strong>ID:</strong>{{ article.id_article }}</li>
+                        <li class="list-group-item"><strong>catégorie:</strong>{{ article.categorie.libel_categorie }}</li>
+                        <li class="list-group-item"><strong>Sous-catégorie:</strong>{{ article.sous_categorie.libel_sous_categorie }}</li>
+                        <li class="list-group-item"><strong>Sous-sous-catégorie:</strong>{{ article.sous_sous_categorie.libel_sous_sous_categorie }}</li>
+                        <li class="list-group-item"><strong>Marque:</strong>{{ article.marque.libel_marque }}</li>
+                        <li class="list-group-item"><strong>Garantie:</strong>{{ article.garantie.libel_garantie }}</li>
+                        <li class="list-group-item"><strong>Prix:</strong>{{ article.prix }} CHF</li>
+                        <li class="list-group-item"><strong>TVA:</strong>{{ article.sous_sous_categorie.sous_categorie.categorie.tva }} %</li>
+                        <li class="list-group-item"><strong>Description:</strong>{{ article.article_description }}</li>
+                        <li class="list-group-item"><strong>Dimension:</strong>{{ article.dimension }}</li>
+                        <li class="list-group-item"><strong>longueur:</strong>{{ article.longueur }}</li>
+                        <li class="list-group-item"><strong>largeur:</strong>{{ article.largeur }}</li>
+                        <li class="list-group-item"><strong>Hauteur:</strong>{{ article.hauteur }}</li>
+                        <li class="list-group-item"><strong>Poids:</strong>{{ article.poids }}</li>
+                        <li class="list-group-item"><strong>Unite dimension:</strong>{{ article.unite_dimension }}</li>
+                        
+                    </ul>
+                </div>
+                <div class="col-md-6 text-center">
+                    {%if article.image_url and article.image_url !='NULL' %}
+                    <img src="{{ url_for('static', filename='media/articles/' ~article.image_url) }}" alt="{{ article.nom }}" class="img-fluid rounded shadow-sm" style="max-height: 300px;">
+                    {%else %}
+                    <p class="text-muted">Aucune image disponible</p>
+                    {% endif %}
+                
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+    <form method="post" action="{{ url_for('home.article_detail', id_article=article.id_article) }}" id="tag-form">
+        <div class="mb-3">
+            <label class="form-label">Tags</label>
+            <div class="mb-3">
+                <label for="tag-color" class="form-label">Couleur du tag</label>
+                <input type="color" id="tag-color" name="tag_color" class="form-control form-control-color" value="#007bff">
+            </div>
+            <input type="text" id="tag-input" class="form-control" placeholder="Entrez un tag et appuyez sur Entrée ou ,">
+            <div id="tag-container" class="mt-2"></div>
+            <input type="hidden" name="tags" id="tags-hidden">
+            <button type="submit" class="btn btn-primary mt-2">Ajouter les tags</button>
+            </div>
+    </form>
+    {% if tag_string %}
+    <div class="mt-3">
+        <h5>Tags reçus :</h5>
+        {% for tag in tag_string %}
+        <span class="badge me-1 mb-1" style="background-color: {{ tag.color }}; color: #fffff;">
+            {{ tag.libel }}
+        </span>
+        {% endfor %}
+    </div>
+    {% endif %}
+    <div class="card">
+        <div class="card-header">
+            <h3>Stock par Filiale</h3>
+        </div>
+        <div class="card-body">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Filiale</th>
+                        <th>Stock disponible</th>
+                        <th>Stock réservée</th>
+                        <th>Total</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for stock in stocks %}
+                    <tr>
+                        <td> {{ stock.filiale.nom }}</td>
+                        <td> {{ stock.quantite_disponible }}</td>
+                        <td> {{ stock.quantite_reservee }}</td>
+                        <td> {{ stock.quantite_disponible + stock.quantite_reservee}}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+                <tfoot>
+                    <tr class="fw-bold">
+                        <td>Total</td>
+                        <td>{{ stocks|sum(attribute='quantite_disponible') }}</td>
+                        <td>{{ stocks|sum(attribute='quantite_reservee') }}</td>
+                        <td>{{ stocks|sum(attribute='quantite_disponible') + stocks|sum(attribute='quantite_reservee') }}</td>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+    </div>
+    <div class="mt-3">
+        <a href="{{ url_for('home.index') }}" class="btn btn-secondary">Retour à la page d'accueil</a>
+    </div>
+</div>
+
+
+
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const tagInput = document.getElementById('tag-input');
+        const tagContainer = document.getElementById('tag-container');
+        const tagColor = document.getElementById('tag-color');
+        const tagsHidden = document.getElementById('tags-hidden');
+        const form = document.getElementById("tag-form");
+
+        let tags = [];
+
+        // Met à jour le champ caché 'tags-hidden' avec la liste JSON des tags
+        function updateHiddenInput() {
+            tagsHidden.value = JSON.stringify(tags);
+            console.log("Champ caché mis à jour :", tagsHidden.value);
+        }
+
+        // Affiche les tags dans la div tag-container
+        function renderTags() {
+            tagContainer.innerHTML = "";
+            tags.forEach(tag => {
+                const badge = document.createElement('span');
+                badge.className = 'badge me-1 mb-1';
+                badge.style.backgroundColor = tag.color;
+                badge.style.color = '#fff';
+                badge.innerHTML = `
+                    ${tag.libel}
+                    <button type="button" class="btn-close btn-close-white btn-sm ms-1" aria-label="Close"></button>
+                `;
+
+                // Gestion du clic sur la croix pour supprimer le tag
+                badge.querySelector('button').addEventListener('click', () => {
+                    removeTag(tag.libel);
+                });
+
+                tagContainer.appendChild(badge);
+            });
+            updateHiddenInput();
+        }
+
+        // Supprime un tag par son libellé
+        function removeTag(libel) {
+            tags = tags.filter(t => t.libel !== libel);
+            renderTags();
+        }
+
+        // Ajoute un tag si ce n’est pas déjà dans la liste
+        function addTag(libel, color) {
+            if (!libel) return;
+            libel = libel.trim();
+            if (libel === "") return;
+
+            // Empêche les doublons (sensible à la casse)
+            if (tags.some(t => t.libel.toLowerCase() === libel.toLowerCase())) return;
+
+            tags.push({ libel: libel, color: color });
+            renderTags();
+        }
+
+        // Ecoute la saisie dans le champ tagInput
+        tagInput.addEventListener('keydown', function (e) {
+            if (e.key === 'Enter' || e.key === ',') {
+                e.preventDefault();
+                addTag(tagInput.value, tagColor.value);
+                tagInput.value = "";
+            }
+        });
+
+        // Avant soumission du formulaire : on ajoute le tag en cours si existant
+        form.addEventListener("submit", function (e) {
+            e.preventDefault();
+
+            // Ajoute tag en cours s'il y en a un
+            if (tagInput.value.trim() !== "") {
+                addTag(tagInput.value, tagColor.value);
+                tagInput.value = "";
+            }
+
+            updateHiddenInput();
+
+            // Envoi réel du formulaire avec un léger délai
+            setTimeout(() => {
+                form.submit();
+            }, 50);
+        });
+
+        // Pré-remplit les tags reçus du serveur (variable Jinja)
+        {% if tag_string %}
+        tags = {{ tag_string | tojson | safe }};
+    renderTags();
+    {% endif %}
+    });
+</script>
+{% endblock %}

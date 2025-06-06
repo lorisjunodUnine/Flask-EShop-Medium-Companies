@@ -1,0 +1,22 @@
+@mixin red_theme{
+    background-color: red;
+    box-shadow: 0 0 25px rgba(red, .25);
+}
+
+
+@mixin theme($color){
+    background-color: $color;
+    box-shadow: 0 0 25px rgba($color, .25);
+    color:white;
+}
+
+.col1 {
+    @include theme(darkgray);
+ }
+
+ .col2 {
+    @include theme(darkred);
+ }
+ .col13{
+    @include theme(darkgreen);
+ }

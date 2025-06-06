@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+{% block content %}
+<div style="margin-left:50px;"> 
+<h2>Liste des Fournisseurs</h2>
+<p>{{ user_type }} - {{ user_id }}</p>
+<table class="table">
+  <thead>
+    <tr>
+      <th scope="col">Id</th>
+      <th scope="col">Name</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for fournisseur in fournisseurs %}
+    <tr>
+      <td><a href="#">{{ fournisseur.id_fournisseur }}</a></td>
+      <td><strong>{{ fournisseur.nom }}</strong></td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+    
+      <li></li>
+    
+    </div>
+{% endblock %}

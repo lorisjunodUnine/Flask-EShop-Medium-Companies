@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+{% block content %}
+<div style="margin-left:50px;"> 
+<h2>Liste des clients</h2>
+<p>{{ user_type }} - {{ user_id }}</p>
+<table class="table">
+  <thead>
+    <tr>
+      <th scope="col">Id</th>
+      <th scope="col">Name</th>
+      <th scope="col">Prénom</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for client in clients %}
+    <tr>
+      <td><a href="{{ url_for('client.client_profile', client_id=client.id_client) }}">{{ client.id_client }}</a></td>
+      <td><strong>{{ client.nom }}</strong></td>
+      <td><strong>{{ client.prenom }}</strong></td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+      <li></li>
+    </div>
+{% endblock %}

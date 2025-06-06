@@ -1,0 +1,116 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container py-5">
+    <h1 class="mb-5">Your Shopping Cart</h1>
+    <div class="row">
+        <div class="col-lg-8">
+            <!-- Cart Items -->
+            <div class="card mb-4">
+                <div class="card-body">
+                    {% if articles_with_qty %}
+                        {% for article, qte in articles_with_qty %}
+                        <div class="row cart-item mb-3">
+                            <div class="col-md-3">
+                                <img src="#" alt="{{ article.nom_article}}" class="img-fluid rounded">
+                            </div>
+                            <div class="col-md-5">
+                                <h5 class="card-title">{{ article.nom_article}}</h5>
+                            </div>
+                            <div class="col-md-2">
+                                <form method="POST" action="{{ url_for('client.ajouter_au_panier', id_article=article.id_article) }}">
+                                    <input type="hidden" name="from_panier" value="true">
+                                    <div class="input-group">
+                                        <button class="btn btn-outline-secondary btn-sm" type="submit" name="delta" value="-1" {% if qte <=1 %}disabled{% endif %}>-</button>
+                                        <input style="max-width:100px" type="text" class="form-control  form-control-sm text-center"
+                                            value="{{ qte }}" readonly>
+                                        <button class="btn btn-outline-secondary btn-sm" type="submit" name="delta" value="1">+</button>
+                                    </div>
+                                </form>
+                            </div>
+                            <div class="col-md-2 text-end">
+                                <p class="fw-bold">{{ '{:.2f}'.format(article.prix_unitaire * qte) }} CHF</p>
+                                <a href="{{ url_for('client.remove', id_article=article.id_article, quantite=qte) }}" class="btn btn-sm btn-outline-danger" title="Supprimer">
+                                    <i class="bi bi-trash"></i>
+                                </a>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                    <p class="text-center text-muted">Votre panier est vide</p>    
+                    {% endif %}
+                <hr>
+                </div>
+            </div>
+            <!-- Continue Shopping Button -->
+            <div class="text-start mb-4">
+                <a href="{{ url_for('home.articles') }}" class="btn btn-outline-primary">
+                    <i class="bi bi-arrow-left me-2"></i>Continuer vos achats
+                </a>
+            </div>
+        </div>
+        <div class="col-lg-4">
+            <!-- Cart Summary -->
+            <div class="card cart-summary">
+                <div class="card-body">
+                    <h5 class="card-title mb-4">Résumé de la commande</h5>
+                    <div class="d-flex justify-content-between mb-3">
+                        <span>Sous-total</span>
+                        <span>{{ '{:.2f}' .format(prix) }} CHF</span>
+                    </div>
+                    <div class="d-flex justify-content-between mb-3">
+                        <span>Frais de livraison</span>
+                        <span>10.00 CHF </span>
+                    </div>
+                    <div class="d-flex justify-content-between mb-3">
+                        <span>Tax</span>
+                        <span>{{ '{:.2f}' .format(prix * 0.081) }} CHF</span>
+                    </div>
+                    <hr>
+                    <div class="d-flex justify-content-between mb-4">
+                        <strong>Total</strong>
+                        <strong>{{ '{:.2f}' .format(prix + 10.00) }} CHF</strong>
+                    </div>
+                    <form method="POST" action="{{ url_for('client.valider_paiement') }}">
+                        <input type="hidden" value="{{ prix }}" name="montant_total">
+                        <div class="mb-3">
+                            <p>Choissisez une filiale</p>
+                            <select class="form-select mb-3" name="filiale_id" required>
+                                <option value=" ">---sélectionnier</option>
+                                {% for filiale in filiales %}
+                                <option value="{{ filiale.id_filiale }}">{{ filiale.nom }}</option>
+                                {% endfor %}
+                            </select>
+                            <p>Choissisez un mode de livraison</p>
+                            <select class="form-select mb-3" name="mode_livraison" required>
+                                <option value=" ">---sélectionnier</option>
+                                {% for mode in modes_livraison %}
+                                <option value="{{ mode.id_mode_livraison }}">{{mode.libel }}</option>
+                                {% endfor %}
+                            </select>
+                            <p>Choissisez un mode de paiement:</p>
+                            <select class="form-select mb-3" name="mode_paiement" required>
+                                {% for mode in modes_paiement %}
+                                <option value="{{ mode.id_mode_paiement }}">{{mode.libel }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <button type="submit" class="btn btn-success w-100">
+                            Conclure la commande
+                        </button>
+                    </form>
+                </div>
+            </div>
+            <!-- Promo Code -->
+            <div class="card mt-4">
+                <div class="card-body">
+                    <h5 class="card-title mb-3">Apply Promo Code</h5>
+                    <div class="input-group mb-3">
+                        <input type="text" class="form-control" placeholder="Enter promo code">
+                        <button class="btn btn-outline-secondary" type="button">Apply</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

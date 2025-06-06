@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+{% block content %}
+<div style="margin-left:50px;"> 
+<h2>Liste des Filiales</h2>
+<p>{{ user_type }} - {{ user_id }}</p>
+<table class="table">
+  <thead>
+    <tr>
+      <th scope="col">Id</th>
+      <th scope="col">Name</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for filiale in filiales %}
+    <tr>
+      <td><a href="{{ url_for('filiale.filiale_dashboard') }}">{{ filiale.id_filiale }}</a></td>
+      <td><strong>{{ filiale.nom }}</strong></td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+    
+      <li></li>
+    
+    </div>
+{% endblock %}

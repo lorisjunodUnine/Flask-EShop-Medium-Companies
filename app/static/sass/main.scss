@@ -1,0 +1,34 @@
+@import "mymixin.scss";
+
+$primary-color: #ffe4c4;
+body {
+    background-color: $primary-color;
+}
+$text-color: blue;
+
+
+$redVal: random(255);
+$greenVal: random(255);
+$blueVal: random(255);
+
+$random-color: rgb($redVal, $greenVal, $blueVal);
+body {
+    background-color: $random-color;
+}
+
+@function double($num){
+    $result: $num *2;
+    @return $result;
+}
+.row {
+    .col-4 {
+        margin: double(10)+px;
+    }
+}
+
+.row {
+    .col-4{
+        margin-top: double(10)+px;
+    }
+}
+

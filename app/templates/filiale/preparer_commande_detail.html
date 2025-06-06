@@ -1,0 +1,161 @@
+{% extends "base.html" %}
+{% block content%}
+<div class="container mt-4">
+    <h2>Préparation de la commande n° {{ commande.id_commande_client }}</h2>
+    <div class="accordion" id="information">
+        <div class="accordion-item">
+            <h2 class="accordion-header">
+                <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#information_body" aria-expanded="true" aria-controls="collapseOne">
+                    Information sur le client
+                </button>
+            </h2>
+            <div id="information_body" class="collapse">
+                <div class="accordion-body">
+                    <p>Client: {{ commande.client.nom if commande.client else 'Client introuvable'}} {{commande.client.prenom if commande.client else 'Client introuvable'}}</p>
+                    <p>Date : {{ commande.date.strftime('%d/%m/%Y') }}</p>
+                    <p>Filiale : {{ commande.filiale.nom }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="accordion" id="creation">
+        <div class="accordion-item">
+            <h2 class="accordion-header">
+                <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#creation_body" aria-expanded="true" aria-controls="collapseOne">
+                    Création de la commande {{ commande.id_commande_client }}
+                </button>
+            </h2>
+            <div id="creation_body" class=" collapse">
+                <div class="accordion-body">
+                    <p>Client: {{ commande.client.nom if commande.client else 'Client introuvable' }} {{commande.client.prenom }}</p>
+                    <p>Date : {{ commande.date.strftime('%d/%m/%Y') }}</p>
+                    <p>Filiale : {{ commande.filiale.nom }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="accordion" id="preparation">
+        <div class="accordion-item">
+            <h2 class="accordion-header">
+                <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#preparation_body" aria-expanded="true" aria-controls="collapseOne">
+                    Préparation de la commande {{ commande.id_commande_client }}
+                </button>
+            </h2>
+            <div id="preparation_body" class="collapse"">
+                <div class="accordion-body">
+                    <form method="POST">
+                        <table class="table table-bordered">
+                            <thead>
+                                <tr>
+                                    <th>Id Article</th>
+                                    <th>Article</th>
+                                    <th>Quantité commandée</th>
+                                    <th>Stock disponible</th>
+                                    <th>Quantité préparée</th>
+                                    <th>Statut Commande</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% set commande_prete = true %}
+                                {% for item in commande.articles_choisis %}
+                                <tr>
+                                    <td>{{ item.articles_commandes_client.id_article }}</td>
+                                    <td>{{ item.articles_commandes_client.nom_article }}</td>
+                                    <td>{{ item.quantite }}</td>
+                                    <td>
+                                    </td>
+                                    <td>
+                                        <!--<button type="button" class="quantity-btn" name="quantite_preparee## item.id_ligne_commande_client ##"" 
+                                        value="## item.quantite_preparee ##" onclick="updateQuantity(this, -1)">-->
+                                        <button type="button" name="quantity-btn"  onclick="updateQuantity(this, -1)">-</button>
+                                        <input type="number" name="quantite_preparee_{{ item.id_ligne_commande_client }}" class="quantity-input" value="{{ item.quantite_preparee or 0 }}" min="0" max="{{ item.quantite }}" data-max="{{ item.quantite }}">
+                                        <button type="button" class="quantity-btn" onclick="updateQuantity(this, 1)">+</button>
+                                    </td>
+                                    {% if (item.quantite_preparee or 0) < item.quantite %}
+                                        {% set commande_prete = false %}
+                                    <td> 
+                                        {{ item.statut_commande }}</td>
+                                </tr>
+                                
+                            </tbody>
+                            <tfoot>
+                                <tr>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td>{{ item.statut_commande }}</td>
+                                </tr>
+                                {% endif %}
+                                {% endfor %}
+                            </tfoot>
+                        </table>
+                        <div class="accordion" id="commande">
+                            <div class="accordion-item">
+                                <h2 class="accordion-header">
+                                    <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#commande_body" aria-expanded="true" aria-controls="collapseOne">
+                                        Commande d'articles en vue de la préparation de la commande
+                                    </button>
+                                </h2>
+                                <div id="commande_body" class="collapse">
+                                    <div class="accordion-body">
+                                        <table class="table table-bordered">
+                                            <thead>
+                                                <tr>
+                                                    <th>ID article</th>
+                                                    <th>Nom d'article</th>
+                                                    <th>Nombe de pièces</th>
+                                                    <tg>pièces minimum par commande</tg>
+                                                    <th>Prochaine date de livraison</th>
+                                                    <th>Date suivante</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {% for item in commande.articles_choisis %}
+                                                <tr>
+                                                    <td>{{ item.articles_commandes_client.id_article }}</td>
+                                                    <td>{{ item.articles_commandes_client.nom_article }}</td>
+                                                    <td></td>
+                                                    <td></td>
+                                                    <td></td>
+                                                    <td></td>
+                                                </tr>
+                                                {% endfor %}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% if commande_prete  %}
+                            <div class="alert alert-success">Commande prête à être validée !</div>
+                            <input type="hidden" name="commande_prete" value="1">
+                            {% else %}
+                            <div class="alert alert-warning">il reste des articles à préparer.</div>
+                            {% endif %}
+                            <button type="submit" name="action" class="btn btn-secondary" value="enregistrer">Enregistrer la préparation</button>
+                            <button type="submit" name="action" class="btn btn-success" value="valider">Valider la préparation</button>
+                            <a href="{{ url_for('filiale.preparer_commande') }}" class="btn btn-secondary">Retour à la liste</a>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+<script>
+    function updateQuantity(button, delta) {
+        const input=button.parentElement.querySelector('.quantity-input');
+        const max = parseInt(input.getAttribute('data-max'));
+        const current = parseInt('input.value');
+        let newValue = current + delta;
+        if (newValue < 0) {
+            newValue = 0;
+        } else if (newValue > max) {
+            newValue = max
+        }
+        input.newValue=newValue
+    }
+</script>

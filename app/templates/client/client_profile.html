@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+{% block content %}
+  <h2>{{ client.nom }}</h2>
+  <div class="container">
+    <div class="display-6" style="background-color: whitesmoke;">
+      <h3>Informations sur : <strong>{{ client.nom }} {{ client.prenom }}</strong></h3>
+      <p>User type est : {{ user_type }} - {{ user_id }}</p>
+    </div> 
+    <div class="row"> 
+    <div class="col"><strong>ID</strong></div>
+    <div class="col"><strong>Nom</strong></div> 
+    <div class="col"><strong>Prenom</strong></div> 
+    <div class="col"><strong>Adresse</strong></div>
+    <div class="col"><strong>Code Postal</strong></div> 
+    <div class="col"><strong>Commune</strong></div>
+    <div class="col"><strong>Canton</strong></div> 
+    <div class="col"><strong>Telephone</strong></div>
+    <div class="col"><strong>EMail</strong></div>
+  </div>
+  <div class="row"> 
+    <div class="col">{{ client.id_client }}</div>
+    <div class="col">{{ client.nom }}</div>
+    <div class="col">{{ client.prenom }}</div> 
+    <div class="col">{{ client.adresse }} {{ client.numero }}</div> 
+    <div class="col">{{ client.code_postal }}</div>
+    <div class="col">{{ client.commune }}</div> 
+    <div class="col">{{ client.canton }}</div> 
+    <div class="col">{{ client.telephone }}</div>
+    <div class="col">{{ client.montant_initial }}</div>
+  </div>
+</div>
+<div class="container">
+
+
+</div>
+<div class="container">
+  <h2>Commandes</h2>
+  {% if commandesclient %}
+  {% for cmd in commandesclient %}
+  <div class="accordion" id="heading{{ cmd.id_commande_client }}">
+    <div class="accordion-item">
+      <h2 class="accordion-header">
+        <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapse{{ cmd.id_commande_client }}" aria-expanded="true" aria-controls="collapse{{ cmd.id_commande_client }}">
+          Commande {{ cmd.id_commande }} le {{ cmd.date.strftime('%d/%m/%Y') }}
+        </button>
+      </h2>
+      <div id="collapse{{ cmd.id_commande_client }}"class="accordion-collpase collapse-show" aria-labelledby="heading{{ cmd.id_commande_client }}" data-bs-parent="#commandes">
+        <div class="accordion-body">
+          <table class="table table-striped">
+            <thead>
+              <tr>
+                <th>Nom d'article</th>
+                <th>Quantite</th>
+                <th>Prix</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for item in cmd.articles_choisis %}
+              <tr>
+                <td>{{ item.articles_commandes_client.nom_article }}</td>
+                <td>{{ item.quantite }}</td>
+                <td>{{ item.articles_commandes_client.prix_unitaire }}</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+            <tfoot>
+              <tr class="table-info">
+                <td colspan="2"><strong>Total de la commande</strong></td>
+                <td><strong>{{ cmd.montant_total }}</strong></td>
+              </tr>
+            </tfoot>
+          </table>
+        </div>
+      </div>  
+    </div>
+  </div>
+  {% endfor %}
+  {% endif %}
+</div>
+{% endblock %}
+

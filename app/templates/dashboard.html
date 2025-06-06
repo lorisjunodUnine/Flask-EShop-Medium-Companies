@@ -1,0 +1,12 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container">
+    <div class="row">
+        <br/>
+        <div class="col text-center">
+            <h2>Bienvenue dans le tableau de bord</h2>
+            <p>Type connecté : {{ session.get('user_type') }}</p>
+        </div>
+    </div>
+</div>
+{% endblock %}

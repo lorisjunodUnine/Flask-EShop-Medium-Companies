@@ -1,0 +1,118 @@
+<html>
+
+<head>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Roboto+Condensed:ital,wght@0,300;0,400;0,700;1,400&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filenmae='css/invoice_styles.css') }}>
+</head>
+
+<body>
+    <div class="parent-border">
+        {% if commandesclient %}
+
+        <div class="border">
+            <div class="parent parent-invoice-logo-type">
+                <span class="invoice-type child">
+                    Facture de la commande {{ commandesclient.id_commande_client}}
+                </span>
+                <img class="invoice-logo child" src="logo.jpg" alt="" width="100" height="100">
+            </div>
+
+
+
+            <div class="parent parent-invoice-table-address">
+                <table class="child invoice-table-address" style="border-spacing: 0;">
+                    <tr class="table-addresses">
+                        <th>De</th>
+                        <th>BILL TO</th>
+                        <th>SHIP TO</th>
+                        <th>INVOICE</th>
+                    </tr>
+                    <tr class="temp">
+                        <td>Kaufmann SA</td>
+                        <td>JARSH INNOVATIONS PRIVATE LIMITED</td>
+                        <td>JARSH COMPLEX</td>
+                        <td>INVOICE</td>
+                    </tr>
+                    <tr>
+                        <td>H.No: 18-A-37WP</td>
+                        <td>H.No: 13-26/4</td>
+                        <td>H.No: 13-26/4</td>
+                        <td>Invoice number</td>
+                    </tr>
+                    <tr>
+                        <td>Hyderabad </td>
+                        <td>Mumbai</td>
+                        <td>Mumbai</td>
+                        <td>Date:</td>
+                    </tr>
+                    <tr>
+                        <td>500054</td>
+                        <td>509321</td>
+                        <td>509876</td>
+                        <td>#####</td>
+                    </tr>
+                </table>
+            </div>
+
+            <div class="parent parent-invoice-table">
+                <table class="invoice-table" style="border-spacing: 0;">
+                    {% for cmd in commandesclient %}
+                    <thead class="table-row-border">
+                        <tr>
+                            <th>S.NO</th>
+                            <th>NAME</th>
+                            <th>QTY</th>
+                            <th>DISCOUNT</th>
+                            <th>TAX</th>
+                            <th>PRICE</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in cmd.articles_choisis %}
+                        <tr>
+                            <td>1</td>
+                            <td>Milk</td>
+                            <td>2 litres</td>
+                            <td>10%</td>
+                            <td>10%</td>
+                            <td>80</td>
+                        </tr>
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                        </tr>
+                    </tfoot>
+                {% endfor %}
+                </table>
+            </div>
+            <div class="parent  parent-invoice-total">
+                <span class="invoice-total-text child">
+                    TOTAL :
+                </span>
+
+                <span class="invoice-total child">
+                    RS: 12000/-
+                </span>
+            </div>
+
+            <div class="parent  parent-invoice-terms">
+                <div class="child  invoice-terms">
+                    <h4>TERMS AND CONDITIONS</h4>
+                    <p>Payment is due within 15 days</p>
+                    <p>State bank of india</p>
+                    <p>Account number: XXXXXX123565</p>
+                    <p>IFSC: 000345432</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>

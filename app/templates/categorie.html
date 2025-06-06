@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container mt-4">
+  <h2>Liste des Catégories</h2>
+  <div class="mb-3">
+    {% for cat in categories %}
+    <a href="{{ url_for('home.categories', id_categorie=cat.id_categorie) }}" class="btn btn-primary m-1 {% if cat.id_categorie == selected_categorie %}active{% endif %}">
+    {{ cat.libel_categorie }}
+    </a>
+    {% endfor %}
+  </div>  
+  {% if sous_categories %}
+  <h4>Sous-Categories</h4>
+  <div class="mb-3">
+    {% for sous in sous_categories %}
+    <a href="{{ url_for('home.categories', id_categorie=selected_categorie, id_sous_categorie=sous.id_sous_categorie) }}" class="btn btn-secondary m-1 {% if sous.id_sous_categorie == selected_sous_categorie %}active{% endif %}">
+      {{ sous.libel_sous_categorie}}
+    </a>
+    {% endfor %}
+  </div>
+  {% endif %}
+  {% if sous_sous_categories %}
+  <h4>Sous-sous-Categories</h4>
+  <ul class="list-group w-50">
+    {% for ss in sous_sous_categories %}
+    <li class="list-group-item">{{ ss.libel_sous_sous_categorie }}</li>
+    {% endfor %}
+  </ul>
+  {% endif %}
+</div>
+{% endblock %}
+
